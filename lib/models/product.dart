@@ -6,6 +6,7 @@ class Product {
   final List<String> images;
   final String category;
   final int category_id;
+
   Product({
     required this.id,
     required this.title,

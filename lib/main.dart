@@ -1,47 +1,46 @@
-import 'dart:math';
-
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:shop/models/product.dart';
-import 'package:shop/services/api.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:shop/cubit/apiCubit/apicubit_cubit.dart';
+import 'package:shop/cubit/auth-cubit/auth_cubit.dart';
+import 'package:shop/firebase_options.dart';
+import 'package:shop/screens/resister.dart';
+import 'package:shop/screens/sgin_in.dart';
 
-Product? products;
+import '/screens/phoneScreen.dart';
+import 'screens/AllCategory.dart';
+
 void main() async {
-  products = await API_call().getproduct_byid(10);
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FlutterNativeSplash.remove();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-//  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Flutter Demo'),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => ApiCubit(),
         ),
-        body: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 4.0,
-            mainAxisSpacing: 4.0,
-          ),
-          itemCount: min(5, 40),
-          itemBuilder: (context, indx) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListTile(
-                title: Text(products!.title),
-                subtitle: Text(products!.id.toString()),
-                leading: Image.network(products!.images[0]),
-              ),
-            );
-          },
+        BlocProvider(
+          create: (context) => AuthCubit(),
         ),
+      ],
+      child: MaterialApp(
+        routes: <String, WidgetBuilder>{
+          '/': (context) => Sign_up(),
+          '/AllCategory': (context) => AllCategory(),
+          '/Phonescreen': (context) => Phonescreen(),
+          '/regester': (context) => resister(),
+        },
       ),
     );
   }
